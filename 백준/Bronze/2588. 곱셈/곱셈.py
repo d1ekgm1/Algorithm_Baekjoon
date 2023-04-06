@@ -1,0 +1,11 @@
+A = int(input())
+B = str(input())
+third = A * int(B[2])
+forth = A * int(B[1])
+fifth = A * int(B[0])
+sixth = A * int(B)
+
+print(third)
+print(forth)
+print(fifth)
+print(sixth)
