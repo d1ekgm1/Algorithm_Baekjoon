@@ -1,7 +1,13 @@
--- 코드를 작성해주세요
-select FISH_INFO.ID, FISH_NAME_INFO.FISH_NAME, FISH_INFO.LENGTH
-from FISH_INFO
-    join FISH_NAME_INFO on FISH_INFO.FISH_TYPE = FISH_NAME_INFO.FISH_TYPE
-where FISH_INFO.FISH_TYPE in
-    (select FISH_TYPE from FISH_INFO group by FISH_TYPE having LENGTH = max(LENGTH))
-order by FISH_INFO.ID
+
+select 
+    i.ID
+    , n.fish_name
+    , i.length
+from 
+    FISH_INFO as i
+    join fish_name_info as n on i.FISH_TYPE = n.FISH_TYPE
+where 1=1 
+    and (i.fish_type, i.length) in (select fish_type, max(length) 
+                                    from fish_info 
+                                    group by fish_type)
+       
