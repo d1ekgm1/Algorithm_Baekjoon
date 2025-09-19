@@ -1,16 +1,19 @@
--- 코드를 입력하세요
-with count_table as (
-SELECT *, count(history_id) over (partition by car_id) as rental_count
-from CAR_RENTAL_COMPANY_RENTAL_HISTORY
-where date_format(START_DATE,'%Y-%m') between '2022-08' and '2022-10'
-order by car_id
+with five_times_table as(
+    select car_id
+    from car_rental_company_rental_history
+    where date_format(start_date,'%Y-%m') >= '2022-08'
+            and date_format(start_date,'%Y-%m') <= '2022-10'
+    group by car_id
+    having count(*)>=5
 )
 
-select date_format(START_DATE,'%m')+0 as MONTH
-    , car_id as CAR_ID
-    , count(history_id) as RECORDS
-from count_table 
-where rental_count>=5 
-group by date_format(START_DATE,'%m'), car_id
-having  count(history_id)>=1
-order by MONTH asc, CAR_ID desc
+select month(start_date) as MONTH,
+        car_id as CAR_ID,
+        count(*) as RECORDS
+from CAR_RENTAL_COMPANY_RENTAL_HISTORY
+where car_id in (select car_id from five_times_table) and
+    date_format(start_date,'%Y-%m') >= '2022-08'
+    and date_format(start_date,'%Y-%m') <= '2022-10'
+group by month(start_date), car_id
+having count(*)>0
+order by month(start_date) asc, car_id desc
