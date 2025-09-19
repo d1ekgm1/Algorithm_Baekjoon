@@ -1,24 +1,23 @@
-WITH eligible_cars AS (
-    SELECT 
-        c.CAR_ID,
-        c.CAR_TYPE,
-        c.DAILY_FEE,
-        d.DISCOUNT_RATE
+WITH fin_table AS (
+    SELECT c.car_id,
+           c.car_type,
+           c.daily_fee,
+           d.discount_rate
     FROM CAR_RENTAL_COMPANY_CAR AS c
     JOIN CAR_RENTAL_COMPANY_DISCOUNT_PLAN AS d 
-        ON c.CAR_TYPE = d.CAR_TYPE AND d.DURATION_TYPE = '30일 이상'
-    WHERE c.CAR_TYPE IN ('세단', 'SUV')
-        AND c.CAR_ID NOT IN (
-            SELECT CAR_ID 
+         ON c.car_type = d.car_type
+        AND d.duration_type = '30일 이상'
+    WHERE c.car_type IN ('SUV','세단')
+      AND c.car_id NOT IN (
+            SELECT car_id
             FROM CAR_RENTAL_COMPANY_RENTAL_HISTORY
-            WHERE NOT (END_DATE < '2022-11-01' OR START_DATE > '2022-11-30')
-        )
+            WHERE start_date <= '2022-11-30'
+              AND end_date   >= '2022-11-01'
+      )
 )
-SELECT 
-    CAR_ID,
-    CAR_TYPE,
-    ROUND((DAILY_FEE * (1 - DISCOUNT_RATE / 100)) * 30, 0) AS FEE
-FROM eligible_cars
-WHERE ROUND((DAILY_FEE * (1 - DISCOUNT_RATE / 100)) * 30, 0) >= 500000 
-  AND ROUND((DAILY_FEE * (1 - DISCOUNT_RATE / 100)) * 30, 0) < 2000000
-ORDER BY FEE DESC, CAR_TYPE ASC, CAR_ID DESC;
+SELECT car_id,
+       car_type,
+       ROUND(daily_fee * (1 - discount_rate / 100) * 30, 0) AS FEE
+FROM fin_table
+WHERE ROUND(daily_fee * (1 - discount_rate / 100) * 30, 0) BETWEEN 500000 AND 1999999
+ORDER BY FEE DESC, car_type ASC, car_id DESC;
